@@ -19,7 +19,7 @@ clean:
 run:
 	$(PYTHON) -m pymnt $(ARGS)
 
-all: install test
+all: install run
 
 
 
