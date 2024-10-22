@@ -1,18 +1,26 @@
 # PyMNT - Python Mutant Ninja Tests
 
-This Python project automates testing using LLM and mutation testing.
-An LLM to generates test cases and mutation testing is run on those cases to ensure their correctness.
+This Python project automates testing using an LLM and mutation testing.
+An LLM generates test cases and mutation testing is run on those cases to ensure their correctness.
 
 ## Installation
 
 ```bash
-pip install -r requirements.txt
+make install
 ```
 
 ## Usage
 
+To generate new tests and run mutation testing:
+
 ```bash
-python main.py
+make run
+```
+
+To only run the tests:
+
+```bash
+make test
 ```
 
 ## Program Flow
