@@ -8,15 +8,11 @@ class MutationRunner(abc.ABC):
     """
 
     def __init__(self, target_module, test_module):
-        self.target_module = target_module
-        self.test_module = test_module
+        self._target_module = target_module
+        self._test_module = test_module
 
     @abc.abstractmethod
-    def run(self) -> str:
-        pass
-
-    @abc.abstractmethod
-    def _process_output(self, result):
+    def run(self):
         pass
 
 
@@ -27,37 +23,51 @@ class MutPyRunner(MutationRunner):
     """
 
     def __init__(self, target_module, test_module):
-        self._target_module = target_module
-        self._test_module = test_module
-        self.command = [
+        self._target_module = self._convert_path_to_module(target_module)
+        self._test_module = self._convert_path_to_module(test_module)
+        # mut.py --target examples.example --unit-test examples.example_test -m
+        self._command = [
             "mut.py",
             "--target",
             self._target_module,
             "--unit-test",
             self._test_module,
             "--runner",
-            "pytest",
+            "unittest",
         ]
 
+    def _convert_path_to_module(self, path):
+        """
+        Convert a file path to a module path.
+        """
+        return path.replace("./", "").replace("/", ".").replace(".py", "")
+
+    # Pretty naive implementation. Should be improved. Definitely not alright to run mut py from the command line.
     def run(self):
         try:
-            result = subprocess.run(
-                self.command, capture_output=True, text=True, check=True
+            process = subprocess.Popen(
+                self._command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
             )
-            return self._process_output(result)
+
+            while True:
+                if process.stdout is None:
+                    break
+                output = process.stdout.readline()
+                if output == "" and process.poll() is not None:
+                    break
+                if output:
+                    print(output.strip())
+
+            stderr = process.communicate()[1]
+            if stderr:
+                print(stderr.strip())
+
+            if process.returncode != 0:
+                raise subprocess.CalledProcessError(process.returncode, self._command)
+
         except subprocess.CalledProcessError as error:
             raise RuntimeError(f"An error occurred while running MutPy: {error}")
         except FileNotFoundError:
             raise RuntimeError(
                 "MutPy command not found. Make sure it's installed and in your PATH."
             )
-
-    def _process_output(self, result):
-        output = "MutPy output:\n"
-        output += result.stdout
-
-        if result.stderr:
-            output += "\nErrors:\n"
-            output += result.stderr
-
-        return output

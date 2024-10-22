@@ -1,7 +1,7 @@
 # Makefile for PyMNT project
 PYTHON := python3
 
-TEST_DIR := "./examples"
+TEST_DIR := ./examples
 
 REQUIREMENTS := requirements.txt
 ARGS := ./examples/example.py fibonacci_iterative
