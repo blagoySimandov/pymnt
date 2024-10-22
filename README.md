@@ -5,9 +5,19 @@ An LLM generates test cases and mutation testing is run on those cases to ensure
 
 ## Installation
 
+Pull down the repository via:
+
+```bash
+git clone https://github.com/blagoySimandov/pymnt.git
+```
+
+Run
+
 ```bash
 make install
 ```
+
+to install dependencies
 
 ## Usage
 
